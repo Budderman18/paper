@@ -71,15 +71,8 @@ jobs:
             const result = {
               action: "build"
             };
-
-            if (event_name === "push" && ref_type === "branch") {
-              const {data: pulls} = await github.rest.pulls.list({ owner, repo, head: `${owner}:${ref_name}`, state: "open" });
-              const pull = pulls.find((pr) => !!pr.labels.find((l) => l.name === "publish-pr"));
-              result["pr"] = pull.number;
-              result["action"] = "paperclip";
-              core.notice(`This is a push action but to a branch with an open PR with the build paperclip label (${JSON.stringify(result)})`);
-              return result;
-            }
+            result["action"] = "paperclip";
+            core.notice(`This is a push action but to a branch with an open PR with the build paperclip label (${JSON.stringify(result)})`);
             return result;
 
       - name: Apply Patches
