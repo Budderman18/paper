@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.mojang.logging.LogUtils;
 import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.entity.TeleportFlag;
 import java.util.HashSet;
@@ -13,8 +14,8 @@ import java.util.Set;
 import java.util.UUID;
 import io.papermc.paper.entity.LookAnchor;
 import java.util.concurrent.CompletableFuture;
+import net.kyori.adventure.util.TriState;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkMap;
@@ -23,12 +24,16 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.server.network.ServerPlayerConnection;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.portal.TeleportTransition;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.EntityEffect;
@@ -57,6 +62,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.permissions.Permission;
@@ -71,8 +77,12 @@ import org.bukkit.util.Vector;
 import net.md_5.bungee.api.chat.BaseComponent; // Spigot
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 public abstract class CraftEntity implements org.bukkit.entity.Entity {
+
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private static PermissibleBase perm;
     private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new CraftPersistentDataTypeRegistry();
 
@@ -122,6 +132,38 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         }
 
         throw new AssertionError("Unknown entity " + (entity == null ? null : entity.getClass()));
+    }
+
+    public Entity getHandle() {
+        return this.entity;
+    }
+
+    public Entity getHandleRaw() {
+        return this.entity;
+    }
+
+    public void setHandle(final Entity entity) {
+        this.entity = entity;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{uuid=" + this.getUniqueId() + '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final CraftEntity other = (CraftEntity) obj;
+        return this.entity == other.entity; // There should never be duplicate entities with differing references
+    }
+
+    @Override
+    public int hashCode() {
+        // The UUID and thus hash code should never change (unlike the entity id)
+        return this.getUniqueId().hashCode();
     }
 
     @Override
@@ -363,13 +405,25 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
     }
 
     @Override
+    @Deprecated
     public void setVisualFire(boolean fire) {
-        this.getHandle().hasVisualFire = fire;
+        setVisualFire(fire ? TriState.TRUE : TriState.NOT_SET);
+    }
+
+    @Override
+    public void setVisualFire(final TriState fire) {
+        Preconditions.checkArgument(fire != null, "TriState cannot be null");
+        this.getHandle().visualFire = fire;
     }
 
     @Override
     public boolean isVisualFire() {
-        return this.getHandle().hasVisualFire;
+        return getVisualFire().toBooleanOrElse(false);
+    }
+
+    @Override
+    public TriState getVisualFire() {
+        return this.getHandle().visualFire;
     }
 
     @Override
@@ -488,6 +542,12 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
     }
 
     @Override
+    public ItemStack getPickItemStack() {
+        net.minecraft.world.item.ItemStack stack = this.getHandle().getPickResult();
+        return stack == null ? ItemStack.empty() : stack.asBukkitCopy();
+    }
+
+    @Override
     public float getFallDistance() {
         return (float) this.getHandle().fallDistance;
     }
@@ -524,14 +584,6 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         this.getHandle().totalEntityAge = value;
     }
 
-    public Entity getHandle() {
-        return this.entity;
-    }
-
-    public Entity getHandleRaw() {
-        return this.entity;
-    }
-
     @Override
     public final EntityType getType() {
         return this.entityType;
@@ -559,30 +611,6 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
     @Override
     public Sound getSwimHighSpeedSplashSound() {
         return CraftSound.minecraftToBukkit(this.getHandle().getSwimHighSpeedSplashSound());
-    }
-
-    public void setHandle(final Entity entity) {
-        this.entity = entity;
-    }
-
-    @Override
-    public String toString() {
-        return "CraftEntity{" + "id=" + this.getEntityId() + '}';
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-
-        final CraftEntity other = (CraftEntity) obj;
-        return this.entity == other.entity; // There should never be duplicate entities with differing references
-    }
-
-    @Override
-    public int hashCode() {
-        // The UUID and thus hash code should never change (unlike the entity id)
-        return this.getUniqueId().hashCode();
     }
 
     @Override
@@ -959,12 +987,19 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
 
     @Override
     public String getAsString() {
-        CompoundTag tag = new CompoundTag();
-        if (!this.getHandle().saveAsPassenger(tag, false, true, true)) {
-            return null;
-        }
+        try (final ProblemReporter.ScopedCollector problemReporter = new ProblemReporter.ScopedCollector(
+            () -> "Entity#toString", LOGGER
+        )) {
+            final TagValueOutput output = TagValueOutput.createWithContext(
+                problemReporter,
+                this.getHandle().registryAccess()
+            );
+            if (!this.getHandle().saveAsPassenger(output, false, true, true)) {
+                return null;
+            }
 
-        return tag.toString();
+            return output.buildResult().toString();
+        }
     }
 
     @Override
@@ -992,32 +1027,40 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
     }
 
     private Entity copy(net.minecraft.world.level.Level level) {
-        CompoundTag compoundTag = new CompoundTag();
-        this.getHandle().saveAsPassenger(compoundTag, false, true, true);
+        try (final ProblemReporter.ScopedCollector problemReporter = new ProblemReporter.ScopedCollector(
+            () -> "Entity#copy", LOGGER
+        )) {
+            final TagValueOutput output = TagValueOutput.createWithContext(problemReporter, level.registryAccess());
+            this.getHandle().saveAsPassenger(output, false, true, true);
 
-        return net.minecraft.world.entity.EntityType.loadEntityRecursive(compoundTag, level, EntitySpawnReason.LOAD, java.util.function.Function.identity());
+            return net.minecraft.world.entity.EntityType.loadEntityRecursive(output.buildResult(), level, EntitySpawnReason.LOAD, java.util.function.Function.identity());
+        }
     }
 
-    public void storeBukkitValues(CompoundTag c) {
+    public void storeBukkitValues(ValueOutput output) {
         if (!this.persistentDataContainer.isEmpty()) {
-            c.put("BukkitValues", this.persistentDataContainer.toTagCompound());
+            output.store("BukkitValues", CompoundTag.CODEC, this.persistentDataContainer.toTagCompound());
         }
     }
 
-    public void readBukkitValues(CompoundTag c) {
-        Tag base = c.get("BukkitValues");
-        if (base instanceof CompoundTag) {
-            this.persistentDataContainer.putAll((CompoundTag) base);
-        }
+    public void readBukkitValues(ValueInput input) {
+        input.read("BukkitValues", CompoundTag.CODEC).ifPresent(this.persistentDataContainer::putAll);
     }
 
     protected CompoundTag save() {
-        CompoundTag tag = new CompoundTag();
+        try (final ProblemReporter.ScopedCollector problemReporter = new ProblemReporter.ScopedCollector(
+            () -> "Entity#save", LOGGER
+        )) {
+            final TagValueOutput tagValueOutput = TagValueOutput.createWithContext(
+                problemReporter,
+                this.getHandle().registryAccess()
+            );
 
-        tag.putString(Entity.ID_TAG, this.getHandle().getEncodeId()); // todo NPE?
-        this.getHandle().saveWithoutId(tag);
+            tagValueOutput.putString(Entity.TAG_ID, this.getHandle().getEncodeId(true));
+            this.getHandle().saveWithoutId(tagValueOutput);
 
-        return tag;
+            return tagValueOutput.buildResult();
+        }
     }
 
     // re-sends the spawn entity packet to updated values which cannot be updated otherwise

@@ -317,7 +317,7 @@ public class MaterialTags {
      */
     public static final MaterialSetTag SPAWN_EGGS = new MaterialSetTag(keyFor("spawn_eggs"))
         .endsWith("_SPAWN_EGG")
-        .ensureSize("SPAWN_EGGS", 81).lock();
+        .ensureSize("SPAWN_EGGS", 82).lock();
 
     /**
      * Covers all colors of stained glass.
@@ -568,8 +568,8 @@ public class MaterialTags {
             Material.FLINT_AND_STEEL, Material.CARROT_ON_A_STICK, Material.WARPED_FUNGUS_ON_A_STICK,
             Material.BRUSH, Material.CARVED_PUMPKIN, Material.COMPASS, Material.SKELETON_SKULL,
             Material.WITHER_SKELETON_SKULL, Material.PLAYER_HEAD, Material.ZOMBIE_HEAD,
-            Material.CREEPER_HEAD, Material.DRAGON_HEAD, Material.PIGLIN_HEAD)
-        .ensureSize("ENCHANTABLE", 75).lock();
+            Material.CREEPER_HEAD, Material.DRAGON_HEAD, Material.PIGLIN_HEAD, Material.MACE)
+        .ensureSize("ENCHANTABLE", 76).lock();
 
     /**
      * Covers the variants of raw ores.

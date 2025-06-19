@@ -6,16 +6,18 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundTagQueryPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.UserWhiteListEntry;
 import net.minecraft.stats.ServerStatsCounter;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.storage.PlayerDataStorage;
+import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.BanEntry;
@@ -33,8 +35,6 @@ import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.craftbukkit.util.CraftLocation;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.MetadataValue;
-import org.bukkit.plugin.Plugin;
 
 @SerializableAs("Player")
 public class CraftOfflinePlayer implements OfflinePlayer, ConfigurationSerializable {
@@ -199,7 +199,8 @@ public class CraftOfflinePlayer implements OfflinePlayer, ConfigurationSerializa
     }
 
     private CompoundTag getData() {
-        return this.storage.load(this.profile.getName(), this.profile.getId().toString()).orElse(null);
+        // This method does not use the problem reporter
+        return this.storage.load(this.profile.getName(), this.profile.getId().toString(), ProblemReporter.DISCARDING).orElse(null);
     }
 
     private CompoundTag getBukkitData() {
@@ -362,18 +363,23 @@ public class CraftOfflinePlayer implements OfflinePlayer, ConfigurationSerializa
     }
 
     @Override
-    public Location getRespawnLocation() {
-        CompoundTag data = this.getData();
+    public Location getRespawnLocation(final boolean loadLocationAndValidate) {
+        final CompoundTag data = this.getData();
         if (data == null) return null;
 
         final ServerPlayer.RespawnConfig respawnConfig = data.read("respawn", ServerPlayer.RespawnConfig.CODEC).orElse(null);
-        if (respawnConfig != null) {
-            final ServerLevel level = this.server.console.getLevel(respawnConfig.dimension());
-            if (level != null) {
-                return CraftLocation.toBukkit(respawnConfig.pos(), level.getWorld(), respawnConfig.angle(), 0);
-            }
+        if (respawnConfig == null) return null;
+
+        final ServerLevel level = this.server.console.getLevel(respawnConfig.dimension());
+        if (level == null) return null;
+
+        if (!loadLocationAndValidate) {
+            return CraftLocation.toBukkit(respawnConfig.pos(), level.getWorld(), respawnConfig.angle(), 0);
         }
-        return null;
+
+        return ServerPlayer.findRespawnAndUseSpawnBlock(level, respawnConfig, false)
+            .map(resolvedPos -> CraftLocation.toBukkit(resolvedPos.position(), level.getWorld(), resolvedPos.yaw(), 0))
+            .orElse(null);
     }
 
     private ServerStatsCounter getStatisticManager() {

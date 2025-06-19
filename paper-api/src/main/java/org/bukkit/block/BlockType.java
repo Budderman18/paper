@@ -53,6 +53,7 @@ import org.bukkit.block.data.type.DaylightDetector;
 import org.bukkit.block.data.type.DecoratedPot;
 import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.block.data.type.Door;
+import org.bukkit.block.data.type.DriedGhast;
 import org.bukkit.block.data.type.Dripleaf;
 import org.bukkit.block.data.type.EndPortalFrame;
 import org.bukkit.block.data.type.EnderChest;
@@ -121,7 +122,6 @@ import org.bukkit.block.data.type.WallHangingSign;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.block.data.type.WallSkull;
 import org.bukkit.inventory.ItemType;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -198,7 +198,7 @@ public interface BlockType extends Keyed, Translatable, net.kyori.adventure.tran
 
     //<editor-fold desc="BlockTypes" defaultstate="collapsed">
     // Start generate - BlockType
-    // @GeneratedFrom 1.21.5
+    // @GeneratedFrom 1.21.6
     BlockType.Typed<Switch> ACACIA_BUTTON = getBlockType("acacia_button");
 
     BlockType.Typed<Door> ACACIA_DOOR = getBlockType("acacia_door");
@@ -898,6 +898,8 @@ public interface BlockType extends Keyed, Translatable, net.kyori.adventure.tran
     BlockType.Typed<Skull> DRAGON_HEAD = getBlockType("dragon_head");
 
     BlockType.Typed<WallSkull> DRAGON_WALL_HEAD = getBlockType("dragon_wall_head");
+
+    BlockType.Typed<DriedGhast> DRIED_GHAST = getBlockType("dried_ghast");
 
     BlockType.Typed<BlockData> DRIED_KELP_BLOCK = getBlockType("dried_kelp_block");
 
@@ -2491,7 +2493,7 @@ public interface BlockType extends Keyed, Translatable, net.kyori.adventure.tran
     BlockData createBlockData(@Nullable String data);
 
     /**
-     * Check if the blockt type is solid (can be built upon)
+     * Check if the block type is solid (can be built upon)
      *
      * @return True if this block type is solid
      */
@@ -2525,7 +2527,7 @@ public interface BlockType extends Keyed, Translatable, net.kyori.adventure.tran
      *   <li>Only occluding blocks can be "powered" ({@link Block#isBlockPowered()}).
      * </ul>
      * This list may be inconclusive. For a full list of the side effects of an occluding
-     * block, see the <a href="https://minecraft.fandom.com/wiki/Opacity">Minecraft Wiki</a>.
+     * block, see the <a href="https://minecraft.wiki/w/Opacity">Minecraft Wiki</a>.
      *
      * @return True if this block type occludes light
      */

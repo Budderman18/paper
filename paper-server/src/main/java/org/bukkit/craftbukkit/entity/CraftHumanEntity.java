@@ -8,6 +8,9 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import com.mojang.logging.LogUtils;
+import io.papermc.paper.adventure.PaperAdventure;
+import net.kyori.adventure.key.Key;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -16,11 +19,13 @@ import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
@@ -36,6 +41,7 @@ import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -76,8 +82,11 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
+
+    private static final Logger LOGGER = LogUtils.getLogger();
     private CraftInventoryPlayer inventory;
     private final CraftInventory enderChest;
     protected final PermissibleBase perm = new PermissibleBase(this);
@@ -89,6 +98,21 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         this.mode = server.getDefaultGameMode();
         this.inventory = new CraftInventoryPlayer(entity.getInventory());
         this.enderChest = new CraftInventory(entity.getEnderChestInventory());
+    }
+
+    @Override
+    public Player getHandle() {
+        return (Player) this.entity;
+    }
+
+    public void setHandle(final Player entity) {
+        super.setHandle(entity);
+        this.inventory = new CraftInventoryPlayer(entity.getInventory());
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{name=" + this.getName() + ", uuid=" + this.getUniqueId() + '}';
     }
 
     @Override
@@ -157,7 +181,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
             return null;
         }
 
-        net.minecraft.server.level.ServerLevel level = ((ServerPlayer) this.getHandle()).server.getLevel(respawnConfig.dimension());
+        net.minecraft.server.level.ServerLevel level = ((ServerPlayer) this.getHandle()).getServer().getLevel(respawnConfig.dimension());
         if (level == null) {
             return null;
         }
@@ -300,21 +324,6 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         Preconditions.checkArgument(mode != null, "GameMode cannot be null");
 
         this.mode = mode;
-    }
-
-    @Override
-    public Player getHandle() {
-        return (Player) this.entity;
-    }
-
-    public void setHandle(final Player entity) {
-        super.setHandle(entity);
-        this.inventory = new CraftInventoryPlayer(entity.getInventory());
-    }
-
-    @Override
-    public String toString() {
-        return "CraftHumanEntity{" + "id=" + this.getEntityId() + "name=" + this.getName() + '}';
     }
 
     @Override
@@ -651,14 +660,14 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
     @Override
     public boolean hasCooldown(ItemStack item) {
-        Preconditions.checkArgument(item != null, "Material cannot be null");
+        Preconditions.checkArgument(item != null, "Item cannot be null");
 
         return this.getHandle().getCooldowns().isOnCooldown(CraftItemStack.asNMSCopy(item));
     }
 
     @Override
     public int getCooldown(ItemStack item) {
-        Preconditions.checkArgument(item != null, "Material cannot be null");
+        Preconditions.checkArgument(item != null, "Item cannot be null");
 
         ResourceLocation group = this.getHandle().getCooldowns().getCooldownGroup(CraftItemStack.asNMSCopy(item));
         if (group == null) {
@@ -671,10 +680,26 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
     @Override
     public void setCooldown(ItemStack item, int ticks) {
-        Preconditions.checkArgument(item != null, "Material cannot be null");
+        Preconditions.checkArgument(item != null, "Item cannot be null");
         Preconditions.checkArgument(ticks >= 0, "Cannot have negative cooldown");
 
         this.getHandle().getCooldowns().addCooldown(CraftItemStack.asNMSCopy(item), ticks);
+    }
+
+    @Override
+    public int getCooldown(Key key) {
+        Preconditions.checkArgument(key != null, "Key cannot be null");
+
+        ItemCooldowns.CooldownInstance cooldown = this.getHandle().getCooldowns().cooldowns.get(PaperAdventure.asVanilla(key));
+        return (cooldown == null) ? 0 : Math.max(0, cooldown.endTime() - this.getHandle().getCooldowns().tickCount);
+    }
+
+    @Override
+    public void setCooldown(Key key, int ticks) {
+        Preconditions.checkArgument(key != null, "Key cannot be null");
+        Preconditions.checkArgument(ticks >= 0, "Cannot have negative cooldown");
+
+        this.getHandle().getCooldowns().addCooldown(PaperAdventure.asVanilla(key), ticks);
     }
 
     @Override
@@ -750,8 +775,13 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
     @Override
     public org.bukkit.entity.Entity getShoulderEntityLeft() {
         if (!this.getHandle().getShoulderEntityLeft().isEmpty()) {
-            Optional<Entity> shoulder = EntityType.create(this.getHandle().getShoulderEntityLeft(), this.getHandle().level(), EntitySpawnReason.LOAD);
-            return shoulder.map(Entity::getBukkitEntity).orElse(null);
+            try (ProblemReporter.ScopedCollector scopedCollector = new ProblemReporter.ScopedCollector(this.getHandle().problemPath(), LOGGER)) {
+                return EntityType.create(
+                        TagValueInput.create(scopedCollector.forChild(() -> ".shoulder"), this.getHandle().registryAccess(), this.getHandle().getShoulderEntityLeft()),
+                        this.getHandle().level(),
+                        EntitySpawnReason.LOAD
+                    ).map(Entity::getBukkitEntity).orElse(null);
+            }
         }
 
         return null;
@@ -759,6 +789,9 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
     @Override
     public void setShoulderEntityLeft(org.bukkit.entity.Entity entity) {
+        if (entity != null) {
+            Preconditions.checkArgument(((CraftEntity) entity).getHandle().getType().canSerialize(), "Cannot set entity of type %s as a shoulder entity", entity.getType().getKey());
+        }
         this.getHandle().setShoulderEntityLeft(entity == null ? new CompoundTag() : ((CraftEntity) entity).save());
         if (entity != null) {
             entity.remove();
@@ -768,8 +801,13 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
     @Override
     public org.bukkit.entity.Entity getShoulderEntityRight() {
         if (!this.getHandle().getShoulderEntityRight().isEmpty()) {
-            Optional<Entity> shoulder = EntityType.create(this.getHandle().getShoulderEntityRight(), this.getHandle().level(), EntitySpawnReason.LOAD);
-            return shoulder.map(Entity::getBukkitEntity).orElse(null);
+            try (ProblemReporter.ScopedCollector scopedCollector = new ProblemReporter.ScopedCollector(this.getHandle().problemPath(), LOGGER)) {
+                return EntityType.create(
+                    TagValueInput.create(scopedCollector.forChild(() -> ".shoulder"), this.getHandle().registryAccess(), this.getHandle().getShoulderEntityRight()),
+                    this.getHandle().level(),
+                    EntitySpawnReason.LOAD
+                ).map(Entity::getBukkitEntity).orElse(null);
+            }
         }
 
         return null;
@@ -777,6 +815,9 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
     @Override
     public void setShoulderEntityRight(org.bukkit.entity.Entity entity) {
+        if (entity != null) {
+            Preconditions.checkArgument(((CraftEntity) entity).getHandle().getType().canSerialize(), "Cannot set entity of type %s as a shoulder entity", entity.getType().getKey());
+        }
         this.getHandle().setShoulderEntityRight(entity == null ? new CompoundTag() : ((CraftEntity) entity).save());
         if (entity != null) {
             entity.remove();

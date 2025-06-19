@@ -17,13 +17,8 @@ public net.minecraft.commands.arguments.blocks.BlockInput tag
 public net.minecraft.core.MappedRegistry validateWrite(Lnet/minecraft/resources/ResourceKey;)V
 public net.minecraft.nbt.ListTag <init>(Ljava/util/List;)V
 public net.minecraft.nbt.ListTag identifyRawElementType()B
-public net.minecraft.nbt.TagParser readArrayTag()Lnet/minecraft/nbt/Tag;
-public net.minecraft.nbt.TagParser type(Ljava/lang/String;)Lnet/minecraft/nbt/Tag;
 public net.minecraft.network.Connection address
 public net.minecraft.network.Connection channel
-public net.minecraft.network.chat.HoverEvent$ItemStackInfo components
-public net.minecraft.network.chat.HoverEvent$ItemStackInfo count
-public net.minecraft.network.chat.HoverEvent$ItemStackInfo item
 public net.minecraft.network.chat.TextColor name
 public net.minecraft.network.chat.contents.TranslatableContents filterAllowedArguments(Ljava/lang/Object;)Lcom/mojang/serialization/DataResult;
 public net.minecraft.network.chat.numbers.FixedFormat value
@@ -108,14 +103,12 @@ public net.minecraft.server.level.ServerPlayer triggerDimensionChangeTriggers(Ln
 public net.minecraft.server.level.ServerPlayer wardenSpawnTracker
 public net.minecraft.server.level.ServerPlayer$RespawnPosAngle
 public net.minecraft.server.level.ServerPlayerGameMode level
-public net.minecraft.server.level.Ticket key
 public net.minecraft.server.level.TicketType register(Ljava/lang/String;JZLnet/minecraft/server/level/TicketType$TicketUse;)Lnet/minecraft/server/level/TicketType;
 public net.minecraft.server.network.ServerGamePacketListenerImpl isChatMessageIllegal(Ljava/lang/String;)Z
 public net.minecraft.server.network.ServerLoginPacketListenerImpl authenticatedProfile
 public net.minecraft.server.network.ServerLoginPacketListenerImpl connection
 public net.minecraft.server.network.ServerLoginPacketListenerImpl state
 public net.minecraft.server.network.ServerLoginPacketListenerImpl$State
-public net.minecraft.server.packs.VanillaPackResourcesBuilder safeGetPath(Ljava/net/URI;)Ljava/nio/file/Path;
 public net.minecraft.server.packs.repository.FolderRepositorySource$FolderPackDetector
 public net.minecraft.server.packs.repository.FolderRepositorySource$FolderPackDetector <init>(Lnet/minecraft/world/level/validation/DirectoryValidator;)V
 public net.minecraft.server.packs.repository.Pack resources
@@ -129,7 +122,6 @@ public net.minecraft.tags.TagEntry id
 public net.minecraft.tags.TagEntry required
 public net.minecraft.tags.TagEntry tag
 public net.minecraft.util.datafix.fixes.BlockStateData register(ILcom/mojang/serialization/Dynamic;[Lcom/mojang/serialization/Dynamic;)V
-public net.minecraft.util.datafix.fixes.EntityCustomNameToComponentFix fixCustomName(Lcom/mojang/serialization/DynamicOps;Ljava/lang/String;Ljava/lang/String;)Lcom/mojang/serialization/Dynamic;
 public net.minecraft.util.datafix.fixes.ItemIdFix ITEM_NAMES
 public net.minecraft.util.datafix.fixes.ItemSpawnEggFix ID_TO_ENTITY
 public net.minecraft.world.BossEvent color
@@ -138,17 +130,21 @@ public net.minecraft.world.BossEvent overlay
 public net.minecraft.world.CompoundContainer container1
 public net.minecraft.world.CompoundContainer container2
 public net.minecraft.world.SimpleContainer items
+public net.minecraft.world.damagesource.CombatTracker entries
+public net.minecraft.world.damagesource.CombatTracker getMostSignificantFall()Lnet/minecraft/world/damagesource/CombatEntry;
+public net.minecraft.world.damagesource.CombatTracker inCombat
+public net.minecraft.world.damagesource.CombatTracker mob
+public net.minecraft.world.damagesource.CombatTracker takingDamage
 public net.minecraft.world.damagesource.DamageSource <init>(Lnet/minecraft/core/Holder;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;)V
 public net.minecraft.world.effect.MobEffect attributeModifiers
 public net.minecraft.world.effect.MobEffect$AttributeTemplate
 public net.minecraft.world.effect.MobEffectInstance hiddenEffect
 public net.minecraft.world.entity.AreaEffectCloud durationOnUse
-public net.minecraft.world.entity.AreaEffectCloud ownerUUID
+public net.minecraft.world.entity.AreaEffectCloud owner
 public net.minecraft.world.entity.AreaEffectCloud potionContents
 public net.minecraft.world.entity.AreaEffectCloud radiusOnUse
 public net.minecraft.world.entity.AreaEffectCloud radiusPerTick
 public net.minecraft.world.entity.AreaEffectCloud reapplicationDelay
-public net.minecraft.world.entity.AreaEffectCloud updateColor()V
 public net.minecraft.world.entity.AreaEffectCloud waitTime
 public net.minecraft.world.entity.Display DATA_POS_ROT_INTERPOLATION_DURATION_ID
 public net.minecraft.world.entity.Display createTransformation(Lnet/minecraft/network/syncher/SynchedEntityData;)Lcom/mojang/math/Transformation;
@@ -198,7 +194,6 @@ public net.minecraft.world.entity.Entity getSwimSound()Lnet/minecraft/sounds/Sou
 public net.minecraft.world.entity.Entity getSwimSplashSound()Lnet/minecraft/sounds/SoundEvent;
 public net.minecraft.world.entity.Entity hasVisualFire
 public net.minecraft.world.entity.Entity isAffectedByBlocks()Z
-public net.minecraft.world.entity.Entity isInBubbleColumn()Z
 public net.minecraft.world.entity.Entity isInRain()Z
 public net.minecraft.world.entity.Entity isInvulnerableToBase(Lnet/minecraft/world/damagesource/DamageSource;)Z
 public net.minecraft.world.entity.Entity onGround
@@ -213,7 +208,6 @@ public net.minecraft.world.entity.Entity unsetRemoved()V
 public net.minecraft.world.entity.Entity wasTouchingWater
 public net.minecraft.world.entity.ExperienceOrb count
 public net.minecraft.world.entity.ExperienceOrb setValue(I)V
-public net.minecraft.world.entity.ExperienceOrb value
 public net.minecraft.world.entity.GlowSquid setDarkTicks(I)V
 public net.minecraft.world.entity.Interaction attack
 public net.minecraft.world.entity.Interaction getHeight()F
@@ -248,14 +242,10 @@ public net.minecraft.world.entity.LivingEntity lastHurtByMob
 public net.minecraft.world.entity.LivingEntity lastHurtByMobTimestamp
 public net.minecraft.world.entity.LivingEntity lastHurtByPlayer
 public net.minecraft.world.entity.LivingEntity lastHurtByPlayerMemoryTime
-public net.minecraft.world.entity.LivingEntity lastHurtByPlayerTime
 public net.minecraft.world.entity.LivingEntity playSecondaryHurtSound(Lnet/minecraft/world/damagesource/DamageSource;)V
 public net.minecraft.world.entity.LivingEntity setLivingEntityFlag(IZ)V
 public net.minecraft.world.entity.LivingEntity useItemRemaining
-public net.minecraft.world.entity.Mob armorDropChances
 public net.minecraft.world.entity.Mob getAmbientSound()Lnet/minecraft/sounds/SoundEvent;
-public net.minecraft.world.entity.Mob getEquipmentDropChance(Lnet/minecraft/world/entity/EquipmentSlot;)F
-public net.minecraft.world.entity.Mob handDropChances
 public net.minecraft.world.entity.Mob isSunBurnTick()Z
 public net.minecraft.world.entity.Mob lootTable
 public net.minecraft.world.entity.Mob lootTableSeed
@@ -339,14 +329,8 @@ public net.minecraft.world.entity.animal.wolf.Wolf setSoundVariant(Lnet/minecraf
 public net.minecraft.world.entity.animal.wolf.Wolf setVariant(Lnet/minecraft/core/Holder;)V
 public net.minecraft.world.entity.boss.enderdragon.EnderDragon subEntities
 public net.minecraft.world.entity.boss.wither.WitherBoss bossEvent
-public net.minecraft.world.entity.decoration.ArmorStand bodyPose
 public net.minecraft.world.entity.decoration.ArmorStand disabledSlots
-public net.minecraft.world.entity.decoration.ArmorStand headPose
 public net.minecraft.world.entity.decoration.ArmorStand isDisabled(Lnet/minecraft/world/entity/EquipmentSlot;)Z
-public net.minecraft.world.entity.decoration.ArmorStand leftArmPose
-public net.minecraft.world.entity.decoration.ArmorStand leftLegPose
-public net.minecraft.world.entity.decoration.ArmorStand rightArmPose
-public net.minecraft.world.entity.decoration.ArmorStand rightLegPose
 public net.minecraft.world.entity.decoration.ArmorStand setMarker(Z)V
 public net.minecraft.world.entity.decoration.ArmorStand setSmall(Z)V
 public net.minecraft.world.entity.decoration.HangingEntity setDirection(Lnet/minecraft/core/Direction;)V
@@ -373,8 +357,6 @@ public net.minecraft.world.entity.monster.Creeper explodeCreeper()V
 public net.minecraft.world.entity.monster.Creeper explosionRadius
 public net.minecraft.world.entity.monster.Creeper maxSwell
 public net.minecraft.world.entity.monster.Creeper swell
-public net.minecraft.world.entity.monster.Drowned groundNavigation
-public net.minecraft.world.entity.monster.Drowned waterNavigation
 public net.minecraft.world.entity.monster.EnderMan teleport()Z
 public net.minecraft.world.entity.monster.EnderMan teleportTowards(Lnet/minecraft/world/entity/Entity;)Z
 public net.minecraft.world.entity.monster.Endermite life
@@ -401,6 +383,7 @@ public net.minecraft.world.entity.monster.SpellcasterIllager$IllagerSpell
 public net.minecraft.world.entity.monster.Strider steering
 public net.minecraft.world.entity.monster.Vex hasLimitedLife
 public net.minecraft.world.entity.monster.Vex limitedLifeTicks
+public net.minecraft.world.entity.monster.Vex owner
 public net.minecraft.world.entity.monster.Vindicator DOOR_BREAKING_PREDICATE
 public net.minecraft.world.entity.monster.Vindicator isJohnny
 public net.minecraft.world.entity.monster.Witch usingTime
@@ -428,10 +411,10 @@ public net.minecraft.world.entity.npc.Villager increaseMerchantCareer()V
 public net.minecraft.world.entity.npc.Villager numberOfRestocksToday
 public net.minecraft.world.entity.npc.Villager releaseAllPois()V
 public net.minecraft.world.entity.npc.Villager setUnhappy()V
+public net.minecraft.world.entity.npc.Villager updateDemand()V
 public net.minecraft.world.entity.npc.WanderingTrader getWanderTarget()Lnet/minecraft/core/BlockPos;
 public net.minecraft.world.entity.player.Abilities flyingSpeed
 public net.minecraft.world.entity.player.Abilities walkingSpeed
-public net.minecraft.world.entity.player.Inventory compartments
 public net.minecraft.world.entity.player.Inventory equipment
 public net.minecraft.world.entity.player.Player DATA_PLAYER_MODE_CUSTOMISATION
 public net.minecraft.world.entity.player.Player closeContainer()V
@@ -459,9 +442,7 @@ public net.minecraft.world.entity.projectile.Arrow updateColor()V
 public net.minecraft.world.entity.projectile.EvokerFangs warmupDelayTicks
 public net.minecraft.world.entity.projectile.EyeOfEnder life
 public net.minecraft.world.entity.projectile.EyeOfEnder surviveAfterDeath
-public net.minecraft.world.entity.projectile.EyeOfEnder tx
-public net.minecraft.world.entity.projectile.EyeOfEnder ty
-public net.minecraft.world.entity.projectile.EyeOfEnder tz
+public net.minecraft.world.entity.projectile.EyeOfEnder target
 public net.minecraft.world.entity.projectile.FireworkRocketEntity DATA_ATTACHED_TO_TARGET
 public net.minecraft.world.entity.projectile.FireworkRocketEntity DATA_ID_FIREWORKS_ITEM
 public net.minecraft.world.entity.projectile.FireworkRocketEntity DATA_SHOT_AT_ANGLE
@@ -481,10 +462,9 @@ public net.minecraft.world.entity.projectile.FishingHook timeUntilHooked
 public net.minecraft.world.entity.projectile.FishingHook timeUntilLured
 public net.minecraft.world.entity.projectile.FishingHook$FishHookState
 public net.minecraft.world.entity.projectile.LargeFireball explosionPower
-public net.minecraft.world.entity.projectile.Projectile cachedOwner
 public net.minecraft.world.entity.projectile.Projectile hasBeenShot
 public net.minecraft.world.entity.projectile.Projectile leftOwner
-public net.minecraft.world.entity.projectile.Projectile ownerUUID
+public net.minecraft.world.entity.projectile.Projectile owner
 public net.minecraft.world.entity.projectile.ShulkerBullet currentMoveDirection
 public net.minecraft.world.entity.projectile.ShulkerBullet flightSteps
 public net.minecraft.world.entity.projectile.ShulkerBullet targetDeltaX
@@ -492,7 +472,6 @@ public net.minecraft.world.entity.projectile.ShulkerBullet targetDeltaY
 public net.minecraft.world.entity.projectile.ShulkerBullet targetDeltaZ
 public net.minecraft.world.entity.projectile.SpectralArrow duration
 public net.minecraft.world.entity.projectile.ThrowableItemProjectile getDefaultItem()Lnet/minecraft/world/item/Item;
-public net.minecraft.world.entity.projectile.ThrownPotion isLingering()Z
 public net.minecraft.world.entity.projectile.ThrownTrident dealtDamage
 public net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge explode(Lnet/minecraft/world/phys/Vec3;)V
 public net.minecraft.world.entity.projectile.windcharge.BreezeWindCharge explode(Lnet/minecraft/world/phys/Vec3;)V
@@ -522,6 +501,7 @@ public net.minecraft.world.flag.FeatureFlagRegistry names
 public net.minecraft.world.food.FoodData exhaustionLevel
 public net.minecraft.world.food.FoodData foodLevel
 public net.minecraft.world.food.FoodData saturationLevel
+public net.minecraft.world.inventory.AbstractContainerMenu menuType
 public net.minecraft.world.inventory.AbstractContainerMenu quickcraftSlots
 public net.minecraft.world.inventory.AbstractContainerMenu quickcraftStatus
 public net.minecraft.world.inventory.AbstractContainerMenu quickcraftType
@@ -558,7 +538,6 @@ public net.minecraft.world.item.context.UseOnContext <init>(Lnet/minecraft/world
 public net.minecraft.world.item.crafting.RecipeManager recipes
 public net.minecraft.world.item.crafting.RecipeMap byKey
 public net.minecraft.world.item.crafting.RecipeMap byType
-public net.minecraft.world.item.enchantment.ItemEnchantments showInTooltip
 public net.minecraft.world.item.trading.MerchantOffer demand
 public net.minecraft.world.item.trading.MerchantOffer result
 public net.minecraft.world.item.trading.MerchantOffer specialPriceDiff
@@ -626,7 +605,7 @@ public net.minecraft.world.level.block.entity.BedBlockEntity color
 public net.minecraft.world.level.block.entity.BeehiveBlockEntity savedFlowerPos
 public net.minecraft.world.level.block.entity.BellBlockEntity resonating
 public net.minecraft.world.level.block.entity.BellBlockEntity resonationTicks
-public net.minecraft.world.level.block.entity.BlockEntity saveId(Lnet/minecraft/nbt/CompoundTag;)V
+public net.minecraft.world.level.block.entity.BlockEntity saveId(Lnet/minecraft/world/level/storage/ValueOutput;)V
 public net.minecraft.world.level.block.entity.BlockEntityType validBlocks
 public net.minecraft.world.level.block.entity.BrewingStandBlockEntity brewTime
 public net.minecraft.world.level.block.entity.BrewingStandBlockEntity fuel
@@ -638,10 +617,11 @@ public net.minecraft.world.level.block.entity.CampfireBlockEntity cookingTime
 public net.minecraft.world.level.block.entity.ChestBlockEntity openersCounter
 public net.minecraft.world.level.block.entity.ChestBlockEntity playSound(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/sounds/SoundEvent;)V
 public net.minecraft.world.level.block.entity.ChiseledBookShelfBlockEntity lastInteractedSlot
+public net.minecraft.world.level.block.entity.ConduitBlockEntity MIN_KILL_SIZE
 public net.minecraft.world.level.block.entity.ConduitBlockEntity destroyTarget
-public net.minecraft.world.level.block.entity.ConduitBlockEntity destroyTargetUUID
 public net.minecraft.world.level.block.entity.ConduitBlockEntity effectBlocks
 public net.minecraft.world.level.block.entity.ConduitBlockEntity getDestroyRangeAABB(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/AABB;
+public net.minecraft.world.level.block.entity.ConduitBlockEntity updateDestroyTarget(Lnet/minecraft/world/entity/EntityReference;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Z)Lnet/minecraft/world/entity/EntityReference;
 public net.minecraft.world.level.block.entity.CrafterBlockEntity craftingTicksRemaining
 public net.minecraft.world.level.block.entity.DecoratedPotBlockEntity decorations
 public net.minecraft.world.level.block.entity.EnderChestBlockEntity openersCounter
@@ -675,13 +655,14 @@ public net.minecraft.world.level.block.entity.TheEndGatewayBlockEntity age
 public net.minecraft.world.level.block.entity.TheEndGatewayBlockEntity exactTeleport
 public net.minecraft.world.level.block.entity.TheEndGatewayBlockEntity exitPortal
 public net.minecraft.world.level.block.entity.TrialSpawnerBlockEntity trialSpawner
+public net.minecraft.world.level.block.entity.trialspawner.TrialSpawner config
 public net.minecraft.world.level.block.entity.trialspawner.TrialSpawner isOminous
 public net.minecraft.world.level.block.entity.trialspawner.TrialSpawner stateAccessor
-public net.minecraft.world.level.block.entity.trialspawner.TrialSpawnerData cooldownEndsAt
-public net.minecraft.world.level.block.entity.trialspawner.TrialSpawnerData currentMobs
-public net.minecraft.world.level.block.entity.trialspawner.TrialSpawnerData detectedPlayers
-public net.minecraft.world.level.block.entity.trialspawner.TrialSpawnerData nextMobSpawnsAt
-public net.minecraft.world.level.block.entity.trialspawner.TrialSpawnerData nextSpawnData
+public net.minecraft.world.level.block.entity.trialspawner.TrialSpawnerStateData cooldownEndsAt
+public net.minecraft.world.level.block.entity.trialspawner.TrialSpawnerStateData currentMobs
+public net.minecraft.world.level.block.entity.trialspawner.TrialSpawnerStateData detectedPlayers
+public net.minecraft.world.level.block.entity.trialspawner.TrialSpawnerStateData nextMobSpawnsAt
+public net.minecraft.world.level.block.entity.trialspawner.TrialSpawnerStateData nextSpawnData
 public net.minecraft.world.level.block.entity.vault.VaultBlockEntity serverData
 public net.minecraft.world.level.block.entity.vault.VaultServerData getRewardedPlayers()Ljava/util/Set;
 public net.minecraft.world.level.block.entity.vault.VaultServerData pauseStateUpdatingUntil(J)V
@@ -700,7 +681,7 @@ public net.minecraft.world.level.chunk.LevelChunk level
 public net.minecraft.world.level.chunk.LevelChunk loaded
 public net.minecraft.world.level.chunk.LevelChunkSection states
 public net.minecraft.world.level.chunk.PalettedContainer registry
-public net.minecraft.world.level.chunk.status.ChunkStatusTasks postLoadProtoChunk(Lnet/minecraft/server/level/ServerLevel;Ljava/util/List;)V
+public net.minecraft.world.level.chunk.status.ChunkStatusTasks postLoadProtoChunk(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/storage/ValueInput$ValueInputList;)V
 public net.minecraft.world.level.chunk.storage.EntityStorage entityDeserializerQueue
 public net.minecraft.world.level.chunk.storage.EntityStorage level
 public net.minecraft.world.level.chunk.storage.RegionFileStorage regionCache
@@ -777,7 +758,6 @@ public-f net.minecraft.world.inventory.AbstractContainerMenu lastSlots
 public-f net.minecraft.world.inventory.AbstractContainerMenu remoteDataSlots
 public-f net.minecraft.world.inventory.AbstractContainerMenu remoteSlots
 public-f net.minecraft.world.inventory.AbstractContainerMenu slots
-public-f net.minecraft.world.item.enchantment.ItemEnchantments$Mutable showInTooltip
 public-f net.minecraft.world.item.trading.MerchantOffer baseCostA
 public-f net.minecraft.world.item.trading.MerchantOffer costB
 public-f net.minecraft.world.item.trading.MerchantOffer maxUses
@@ -788,10 +768,6 @@ public-f net.minecraft.world.level.LevelSettings hardcore
 public-f net.minecraft.world.level.LevelSettings levelName
 public-f net.minecraft.world.level.block.ChestBlock MENU_PROVIDER_COMBINER
 public-f net.minecraft.world.level.block.entity.BannerBlockEntity baseColor
-public-f net.minecraft.world.level.block.entity.trialspawner.TrialSpawner normalConfig
-public-f net.minecraft.world.level.block.entity.trialspawner.TrialSpawner ominousConfig
-public-f net.minecraft.world.level.block.entity.trialspawner.TrialSpawner requiredPlayerRange
-public-f net.minecraft.world.level.block.entity.trialspawner.TrialSpawner targetCooldownLength
 public-f net.minecraft.world.level.saveddata.maps.MapItemSavedData centerX
 public-f net.minecraft.world.level.saveddata.maps.MapItemSavedData centerZ
 public-f net.minecraft.world.level.saveddata.maps.MapItemSavedData dimension
